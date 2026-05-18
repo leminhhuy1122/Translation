@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Glacier Translate - giao diện dịch thuật tiếng Việt với chế độ sáng tối và lịch sử dịch."
+  />
+  <title>Glacier Translate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="ambient ambient-three"></div>
+
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Glacier Translate">
+      <span class="brand-mark material-symbols-outlined" aria-hidden="true">translate</span>
+      <span>Glacier Translate</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Điều hướng chính" data-i18n-aria="mainNavigation">
+      <a class="active" href="#translator" data-i18n="navTranslator">Dịch thuật</a>
+      <a href="#history" data-i18n="navHistory">Lịch sử</a>
+      <a href="#saved" data-i18n="navSaved">Đã lưu</a>
+    </nav>
+
+    <div class="topbar-actions">
+      <div class="ui-language">
+        <button
+          class="locale-button"
+          id="ui-language-toggle"
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          data-i18n-aria="openLanguageMenu"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">language</span>
+          <span id="ui-language-label">Tiếng Việt</span>
+          <span class="material-symbols-outlined chevron" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="language-menu" id="ui-language-menu" role="listbox" aria-label="Ngôn ngữ giao diện" data-i18n-aria="uiLanguageMenu">
+          <button class="language-option" type="button" role="option" data-ui-language="vi" aria-selected="true">
+            <span>Tiếng Việt</span>
+            <span class="material-symbols-outlined check-icon" aria-hidden="true">check</span>
+          </button>
+          <button class="language-option" type="button" role="option" data-ui-language="en" aria-selected="false">
+            <span>English</span>
+            <span class="material-symbols-outlined check-icon" aria-hidden="true">check</span>
+          </button>
+        </div>
+      </div>
+      <button class="icon-button" id="theme-toggle" type="button" aria-label="Chuyển giao diện sáng tối" data-i18n-aria="toggleTheme">
+        <span class="material-symbols-outlined" id="theme-icon" aria-hidden="true">dark_mode</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow" data-i18n="heroEyebrow">Dịch thuật chuyên dụng</p>
+      <h1 id="hero-title" data-i18n="heroTitle">Phá bỏ mọi rào cản ngôn ngữ</h1>
+      <p data-i18n="heroSubtitle">Trải nghiệm dịch thuật nhanh</p>
+    </section>
+
+    <section class="translator-shell" id="translator" aria-label="Công cụ dịch" data-i18n-aria="translatorAria">
+      <div class="translator-card">
+        <div class="panel source-panel">
+          <div class="panel-toolbar">
+            <label class="language-field" for="source-language">
+              <span data-i18n="sourceLanguage">Ngôn ngữ nguồn</span>
+              <select id="source-language"></select>
+            </label>
+            <div class="source-tools">
+              <button class="ghost-button" id="clear-input" type="button" title="Xóa nội dung" data-i18n-title="clearButton" data-i18n-aria="clearButton">
+                <span class="material-symbols-outlined" aria-hidden="true">close</span>
+              </button>
+              <span class="char-count" id="char-count">0 / 5000</span>
+            </div>
+          </div>
+
+          <textarea
+            id="source-text"
+            maxlength="5000"
+            placeholder="Nhập văn bản cần dịch..."
+            data-i18n-placeholder="inputPlaceholder"
+            spellcheck="false"
+            autocomplete="off"
+          ></textarea>
+        </div>
+
+        <button class="swap-button" id="swap-languages" type="button" aria-label="Đổi chiều ngôn ngữ" data-i18n-aria="swapLanguages">
+          <span class="material-symbols-outlined" aria-hidden="true">sync_alt</span>
+        </button>
+
+        <div class="panel target-panel">
+          <div class="panel-toolbar">
+            <label class="language-field" for="target-language">
+              <span data-i18n="targetLanguage">Ngôn ngữ đích</span>
+              <select id="target-language"></select>
+            </label>
+            <span class="detected-language" id="detected-language"></span>
+          </div>
+
+          <div class="translation-output placeholder" id="translation-output" data-i18n="outputPlaceholder">
+            Bản dịch sẽ hiển thị tại đây...
+          </div>
+
+          <div class="output-actions">
+            <button class="glass-action" id="copy-translation" type="button" disabled title="Sao chép bản dịch" data-i18n-title="copyButton" data-i18n-aria="copyButton">
+              <span class="material-symbols-outlined" aria-hidden="true">content_copy</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="primary-action-wrap">
+        <button class="translate-button" id="translate-button" type="button">
+          <span class="material-symbols-outlined" aria-hidden="true">translate</span>
+          <span id="translate-button-text" data-i18n="translateButton">Dịch ngay</span>
+        </button>
+      </div>
+
+      <p class="status-message" id="status-message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="history-section" id="history" aria-labelledby="history-title">
+      <div class="section-heading">
+        <h2 id="history-title">
+          <span class="material-symbols-outlined" aria-hidden="true">history</span>
+          <span data-i18n="recentTranslations">Bản dịch gần đây</span>
+        </h2>
+        <button class="text-button" id="clear-history" type="button" data-i18n="clearHistory">Xóa lịch sử</button>
+      </div>
+
+      <div class="history-grid" id="history-list"></div>
+      <p class="empty-state" id="history-empty" data-i18n="emptyHistory">Chưa có bản dịch nào. Hãy thử dịch một câu đầu tiên.</p>
+    </section>
+  </main>
+
+  <footer class="footer" id="saved">
+    <strong>Glacier Translate</strong>
+    <span data-i18n="footerText">Giao diện Frozen Light, kết nối trực tiếp với API dịch hiện tại.</span>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
