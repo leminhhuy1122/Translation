@@ -1,82 +1,162 @@
-# Translate AI / Glacier Translate
+# Glacier Translate
 
-Node.js/Express API dịch thuật kèm frontend tĩnh Glacier Translate trong `public/`. Dự án đã được tách để chạy ổn định theo hai chế độ:
+> Modern AI Translation Web App built for Vietnamese users first.
 
-- Local dev: Express server serve cả frontend và API.
-- Vercel: frontend được build từ `public/` ra `dist/`, API chạy bằng Serverless Function trong `api/`.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel)](https://translation-snowy.vercel.app/)
+![Node.js](https://img.shields.io/badge/Node.js-%3E%3D22.12-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
-## Yêu Cầu
+Glacier Translate is a polished translation web app with a Vietnamese-first experience, a futuristic glass UI, and a Node.js translation API that can run locally with Express or deploy cleanly on Vercel Serverless Functions.
 
-- Node.js 22.12+
-- npm 10+
+🌐 **Live Demo:** [translation-snowy.vercel.app](https://translation-snowy.vercel.app/)
 
-## Cài Đặt
+---
+
+## Preview
+
+Glacier Translate ships with a responsive, glassmorphism-inspired interface designed for quick everyday translation.
+
+- Light mode by default, with dark mode available.
+- Vietnamese and English interface language switching.
+- Same-origin API calls for local and production deployments.
+- No screenshot asset is currently included in the repository.
+
+Open the live app here:
+
+👉 **[Launch Glacier Translate](https://translation-snowy.vercel.app/)**
+
+---
+
+## Features
+
+- 🤖 **AI Translation** through the backend translation provider.
+- 🇻🇳 **Vietnamese-first UX** with Vietnamese as the default interface language.
+- 🌐 **UI language switching** between Tiếng Việt and English.
+- ☀️ **Light mode by default** with dark mode support.
+- 🕘 **Translation history** stored locally in the browser.
+- 🔁 **Language swap** for fast source/target switching.
+- 📋 **Copy translation** with one click.
+- 📱 **Responsive design** for desktop, tablet, and mobile screens.
+- ✨ **Modern futuristic UI** using a Glacier glass style.
+- ▲ **Vercel deployment** with Serverless Functions.
+- 🧯 **Error handling** for validation and provider failures.
+- ⏳ **Loading state** while translation requests are running.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Frontend | HTML, CSS, Vanilla JavaScript, Vite |
+| Backend | Node.js, Express, ES Modules |
+| Translation Provider | Google Translate unofficial provider, mock provider for testing |
+| Validation | Custom request validation |
+| Logging | Winston, Morgan |
+| Security / Middleware | Helmet, CORS, compression, rate limit |
+| Deployment | Vercel static output + Serverless Function |
+
+---
+
+## Project Structure
+
+```text
+project-root/
+  api/
+    translate.js              # Vercel Serverless Function
+  public/
+    index.html                # Glacier UI
+    app.js                    # Frontend logic, i18n, API calls
+    styles.css                # Responsive visual system
+  src/
+    app.js                    # Express app for local development
+    server.js                 # Local server bootstrap
+    config/
+    controllers/
+    errors/
+    logger/
+    middlewares/
+    providers/
+    routes/
+    services/
+    utils/
+    validators/
+  scripts/
+    deploy-gh-pages.js
+  package.json
+  vercel.json
+  vite.config.js
+  README.md
+```
+
+---
+
+## Installation
+
+Clone the repository and install dependencies:
 
 ```bash
+git clone https://github.com/leminhhuy1122/Translation.git
+cd Translation
 npm install
 ```
 
-## Chạy Local
+Requirements:
 
-Chạy full app giống production, frontend và API cùng origin:
+- Node.js `>=22.12.0`
+- npm `>=10.0.0`
+
+---
+
+## Local Development
+
+Run the full local app with Express:
 
 ```bash
 npm run dev
 ```
 
-Mở:
+Open:
 
 ```text
-http://127.0.0.1:3000
+http://localhost:3000
 ```
 
-Test API:
+The local Express server serves:
+
+- Frontend: `/`
+- Translate API: `/api/translate`
+- Health check: `/health`
+
+Useful scripts:
 
 ```bash
-curl -X POST http://localhost:3000/api/translate \
-  -H "Content-Type: application/json" \
-  -d "{\"text\":\"xin chào\",\"from\":\"vi\",\"to\":\"en\",\"raw\":false}"
+npm start          # Run Express server
+npm run dev        # Run Express server with watch mode
+npm run build      # Build frontend for Vercel
+npm run lint       # Run ESLint
+npm test           # Run tests
 ```
 
-Script hữu ích:
+For frontend-only development:
 
 ```bash
-npm start        # chạy Express không watch
-npm run lint
-npm test
-npm run build   # build frontend bằng Vite
+npm run dev:frontend
 ```
 
-`npm run dev:frontend` chỉ chạy Vite frontend, dùng khi cần xem UI tĩnh riêng. Luồng khuyến nghị vẫn là `npm run dev` để API `/api/translate` hoạt động cùng frontend.
+---
 
-`npm run build` mặc định build asset ở root `/`, phù hợp với Vercel. Workflow GitHub Pages cũ được giữ ở `npm run build:github` và `npm run deploy`.
+## Deployment
 
-## Deploy Lên Vercel
+Glacier Translate is configured for Vercel.
 
-Vercel dùng:
+### Deploy With Vercel
 
-- `api/translate.js` cho `POST /api/translate`.
-- `public/` làm source frontend.
-- `npm run build` để Vite xuất frontend ra `dist/`.
-- `vercel.json` để khai báo build output và fallback về `index.html`.
-
-Các bước:
-
-```bash
-npm install
-npm run lint
-npm test
-npm run build
-```
-
-Sau đó import repository lên Vercel hoặc chạy Vercel CLI nếu bạn đã cài:
-
-```bash
-vercel
-vercel --prod
-```
-
-Trong Vercel Project Settings:
+1. Push the repository to GitHub.
+2. Import the project in Vercel.
+3. Use the default project settings, or configure:
 
 ```text
 Build Command: npm run build
@@ -84,17 +164,30 @@ Output Directory: dist
 Install Command: npm install
 ```
 
-Các giá trị này cũng đã có trong `vercel.json`, nên thường không cần cấu hình thủ công.
+The deployment is controlled by:
 
-## Biến Môi Trường
-
-Không hardcode `localhost` hoặc token trong code. Frontend luôn gọi same-origin:
-
-```js
-fetch('/api/translate', ...)
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/:path((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
 ```
 
-Biến môi trường có thể cấu hình trên Vercel:
+Vercel automatically maps:
+
+```text
+api/translate.js -> /api/translate
+```
+
+### Environment Variables
+
+The app works with defaults, but these variables can be configured on Vercel:
 
 ```text
 TRANSLATION_PROVIDER=google_unofficial
@@ -109,21 +202,31 @@ LOG_LEVEL=info
 LOG_FORMAT=json
 ```
 
-Không bắt buộc thêm biến nào nếu dùng mặc định. Nếu muốn test an toàn trên preview, có thể đặt:
+For safe preview testing without calling the real provider:
 
 ```text
 TRANSLATION_PROVIDER=mock
 ```
 
+Do not use `mock` in production if you want real translations.
+
+---
+
 ## API
 
-Endpoint:
+### `POST /api/translate`
 
-```text
-POST /api/translate
+Translate text from one language to another.
+
+#### Request
+
+```bash
+curl -X POST http://localhost:3000/api/translate \
+  -H "Content-Type: application/json" \
+  -d "{\"text\":\"xin chào\",\"from\":\"vi\",\"to\":\"en\",\"raw\":false}"
 ```
 
-Request:
+Body:
 
 ```json
 {
@@ -134,7 +237,7 @@ Request:
 }
 ```
 
-Response thành công:
+#### Success Response
 
 ```json
 {
@@ -157,7 +260,19 @@ Response thành công:
 }
 ```
 
-Method khác `POST` trả:
+#### Error Response
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_INPUT",
+    "message": "Text must be a non-empty string."
+  }
+}
+```
+
+Unsupported methods return:
 
 ```json
 {
@@ -169,60 +284,100 @@ Method khác `POST` trả:
 }
 ```
 
-## Cấu Trúc
+---
+
+## Theme System
+
+Glacier Translate supports both light and dark themes.
+
+- Light mode is the default for first-time visitors.
+- Theme preference is saved in `localStorage`.
+- Users can switch theme from the top-right control.
+- Stored key:
 
 ```text
-project-root/
-  api/
-    translate.js
-  public/
-    index.html
-    app.js
-    styles.css
-  src/
-    app.js
-    server.js
-    config/
-    controllers/
-    errors/
-    logger/
-    middlewares/
-    providers/
-    routes/
-    services/
-    utils/
-    validators/
-  scripts/
-    deploy-gh-pages.js
-  package.json
-  vercel.json
-  vite.config.js
-  README.md
+glacier.translate.theme
 ```
 
-## Ghi Chú Kỹ Thuật
+If a user has previously selected dark mode, the app will respect that saved preference.
 
-- `src/server.js` có `app.listen()` chỉ dùng cho local dev.
-- `api/translate.js` không gọi `app.listen()`, chỉ export default async handler cho Vercel.
-- Serverless handler tái sử dụng `validateTranslatePayload()` và `translationService.translate()` từ `src/`.
-- Logger không ghi file trong môi trường Vercel serverless.
-- Vite mặc định dùng base `/` cho Vercel. Nếu cần base khác, đặt `VITE_BASE_PATH` hoặc dùng `npm run build:github` cho GitHub Pages cũ.
+---
 
-## Kiểm Tra
+## i18n
 
-```bash
-npm run lint
-npm test
-npm run build
+The interface currently supports:
+
+- Tiếng Việt
+- English
+
+UI copy is defined in `public/app.js`:
+
+```text
+translations.vi
+translations.en
 ```
 
-Sau khi deploy Vercel, kiểm tra:
+Main i18n helpers:
 
-- Trang `/` load đúng Glacier UI.
-- Network request khi bấm dịch là `POST /api/translate`.
-- Console không có lỗi `localhost`, CORS hoặc asset path.
-- API trả JSON đúng contract hiện tại.
+```text
+setUILanguage(lang)
+applyTranslations()
+getText(key)
+```
+
+The selected UI language is saved in:
+
+```text
+glacier.translate.uiLanguage
+```
+
+---
+
+## Responsive Design
+
+The UI is built to work across common screen sizes:
+
+- Desktop translator layout
+- Tablet-friendly panels
+- Mobile-first stacking
+- Touch-friendly controls
+- Responsive history cards
+
+The app avoids separate mobile routes and keeps the translation workflow consistent across devices.
+
+---
+
+## Security & Stability
+
+Glacier Translate keeps deployment and runtime behavior predictable:
+
+- No hardcoded `localhost` in frontend API calls.
+- Frontend uses same-origin requests:
+
+```js
+fetch('/api/translate', ...)
+```
+
+- Request validation prevents empty text and unsupported languages.
+- Serverless API returns consistent JSON errors.
+- Provider failures are caught and do not crash the app.
+- User text is not logged in full; logs only include metadata such as text length.
+- Environment values are read from `process.env`.
+- Vercel serverless runtime does not write file logs.
+
+---
+
+## Notes
+
+- `dist/` is a generated build folder and is ignored by Git.
+- Vercel creates `dist/` automatically during deployment.
+- `src/server.js` is for local Express development only.
+- `api/translate.js` is the production serverless handler for Vercel.
+- `google_unofficial` depends on an unofficial Google Translate endpoint, so rate limits or provider changes can affect real translation behavior.
+- `mock` provider is useful for tests and previews, but it does not perform real translation.
+
+---
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
