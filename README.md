@@ -57,7 +57,7 @@ Dự án đã được cấu hình deploy đúng chuẩn GitHub Pages bằng Vit
 - Build bằng Vite.
 - Deploy thư mục `dist/`.
 - `base` đã đặt đúng repo: `/Translation/`.
-- Script deploy dùng `gh-pages`.
+- Script deploy publish `dist/` lên branch `gh-pages`.
 - Asset CSS/JS được Vite hash và tự trỏ đúng `/Translation/assets/...`.
 
 File cấu hình:
@@ -84,9 +84,19 @@ Script trong `package.json`:
   "dev:server": "node --watch src/server.js",
   "build": "vite build",
   "preview": "vite preview --host 0.0.0.0",
-  "deploy": "npm run build && gh-pages -d dist"
+  "deploy": "npm run build && node scripts/deploy-gh-pages.js"
 }
 ```
+
+Trong GitHub repository, vào `Settings > Pages` và chọn:
+
+```text
+Source: Deploy from a branch
+Branch: gh-pages
+Folder: / (root)
+```
+
+Không chọn `main / (root)`, vì như vậy GitHub Pages sẽ đọc root repo và có thể hiện README.
 
 ## Lưu Ý Quan Trọng Về API
 
@@ -311,6 +321,8 @@ src/
   test.js
 
 vite.config.js
+scripts/
+  deploy-gh-pages.js
 dist/
 ```
 
