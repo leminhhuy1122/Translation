@@ -44,6 +44,15 @@ function createApp(options = {}) {
 
     app.use('/api', options.rateLimiter || apiRateLimiter, createApiRouter(options));
 
+    app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api') || !req.accepts('html')) {
+            next();
+            return;
+        }
+
+        res.sendFile(path.join(publicDir, 'index.html'));
+    });
+
     app.use(notFoundHandler);
     app.use(errorHandler);
 

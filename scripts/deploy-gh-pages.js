@@ -32,7 +32,7 @@ async function main() {
     run('git', ['commit', '-m', 'Deploy Vite build'], { cwd: tempDir });
     run('git', ['push', '-f', 'origin', `${branch}:${branch}`], { cwd: tempDir });
 
-    console.log(`Published ${distDir} to ${branch}.`);
+    console.warn(`Published ${distDir} to ${branch}.`);
 }
 
 main().catch((error) => {

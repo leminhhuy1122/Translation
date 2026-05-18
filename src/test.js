@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { createTranslateHandler } from '../api/translate.js';
 import { createApp } from './app.js';
 import AppError from './errors/AppError.js';
 import translate, { buildTranslateUrl, generateToken, parseTranslateResponse } from './index.js';
@@ -61,6 +62,26 @@ async function postJson(server, path, body) {
         },
         body: JSON.stringify(body)
     });
+}
+
+function createMockResponse() {
+    return {
+        body: null,
+        headers: new Map(),
+        statusCode: 200,
+        setHeader(name, value) {
+            this.headers.set(name.toLowerCase(), value);
+            return this;
+        },
+        status(statusCode) {
+            this.statusCode = statusCode;
+            return this;
+        },
+        json(body) {
+            this.body = body;
+            return this;
+        }
+    };
 }
 
 test('languages lookup supports code and name', () => {
@@ -195,6 +216,43 @@ test('POST /api/translate returns provider error without crashing app', async (t
     assert.equal(response.status, 502);
     assert.equal(body.success, false);
     assert.equal(body.error.code, 'PROVIDER_FAILED');
+});
+
+test('Vercel translate handler returns translation for a valid POST request', async () => {
+    const handler = createTranslateHandler({
+        translationService: createMockService(),
+        logger: silentLogger
+    });
+    const response = createMockResponse();
+
+    await handler({
+        method: 'POST',
+        body: {
+            text: 'hello',
+            from: 'en',
+            to: 'vi',
+            raw: false
+        }
+    }, response);
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.body.success, true);
+    assert.equal(response.body.data.text, '[mock:vi] hello');
+});
+
+test('Vercel translate handler rejects non-POST requests', async () => {
+    const handler = createTranslateHandler({
+        translationService: createMockService(),
+        logger: silentLogger
+    });
+    const response = createMockResponse();
+
+    await handler({ method: 'GET', body: {} }, response);
+
+    assert.equal(response.statusCode, 405);
+    assert.equal(response.headers.get('allow'), 'POST');
+    assert.equal(response.body.success, false);
+    assert.equal(response.body.error.code, 'METHOD_NOT_ALLOWED');
 });
 
 test('translation service can fall back to a secondary provider', async () => {

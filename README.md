@@ -1,276 +1,137 @@
 # Translate AI / Glacier Translate
 
-## Chạy Và Deploy
+Node.js/Express API dịch thuật kèm frontend tĩnh Glacier Translate trong `public/`. Dự án đã được tách để chạy ổn định theo hai chế độ:
 
-Yêu cầu:
+- Local dev: Express server serve cả frontend và API.
+- Vercel: frontend được build từ `public/` ra `dist/`, API chạy bằng Serverless Function trong `api/`.
 
-- Node.js 22+
+## Yêu Cầu
+
+- Node.js 22.12+
 - npm 10+
 
-Cài dependency:
+## Cài Đặt
 
 ```bash
 npm install
 ```
 
-Chạy frontend bằng Vite:
+## Chạy Local
+
+Chạy full app giống production, frontend và API cùng origin:
 
 ```bash
 npm run dev
 ```
 
-Build ra thư mục `dist/`:
-
-```bash
-npm run build
-```
-
-Deploy lên GitHub Pages:
-
-```bash
-npm run deploy
-```
-
-GitHub Pages URL:
+Mở:
 
 ```text
-https://leminhhuy1122.github.io/Translation/
+http://127.0.0.1:3000
 ```
 
-Chạy backend Express local:
-
-```bash
-npm run dev:server
-```
-
-Kiểm tra code:
-
-```bash
-npm run lint
-npm test
-```
-
-## GitHub Pages / Vite
-
-Dự án đã được cấu hình deploy đúng chuẩn GitHub Pages bằng Vite:
-
-- Build bằng Vite.
-- Deploy thư mục `dist/`.
-- `base` đã đặt đúng repo: `/Translation/`.
-- Script deploy publish `dist/` lên branch `gh-pages`.
-- Asset CSS/JS được Vite hash và tự trỏ đúng `/Translation/assets/...`.
-
-File cấu hình:
-
-```js
-// vite.config.js
-import { defineConfig } from 'vite';
-
-export default defineConfig({
-    root: 'public',
-    base: '/Translation/',
-    build: {
-        outDir: '../dist',
-        emptyOutDir: true
-    }
-});
-```
-
-Script trong `package.json`:
-
-```json
-{
-  "dev": "vite --host 0.0.0.0",
-  "dev:server": "node --watch src/server.js",
-  "build": "vite build",
-  "preview": "vite preview --host 0.0.0.0",
-  "deploy": "npm run build && node scripts/deploy-gh-pages.js"
-}
-```
-
-Trong GitHub repository, vào `Settings > Pages` và chọn:
-
-```text
-Source: Deploy from a branch
-Branch: gh-pages
-Folder: / (root)
-```
-
-Không chọn `main / (root)`, vì như vậy GitHub Pages sẽ đọc root repo và có thể hiện README.
-
-## Lưu Ý Quan Trọng Về API
-
-GitHub Pages chỉ host frontend tĩnh, không chạy được backend Node.js.
-
-Frontend hiện gọi:
-
-```text
-/api/translate
-```
-
-Khi chạy chung với Express local thì API hoạt động bình thường. Khi deploy lên GitHub Pages, bạn cần deploy backend ở một nơi khác rồi cấu hình biến Vite:
-
-```bash
-VITE_API_BASE_URL=https://your-backend-domain.com npm run build
-```
-
-Nếu không cấu hình backend public, giao diện trên GitHub Pages vẫn hiển thị đúng nhưng chức năng dịch thật sẽ không gọi được API.
-
-## Tóm Tắt Dự Án
-
-Đây là Node.js API server dùng ES Modules, runtime Node.js 22+, có frontend tĩnh trong `public/`.
-
-Backend cung cấp API:
-
-- `GET /health`
-- `POST /api/translate`
-- `GET /api/languages`
-- `GET /api/languages/:code`
-
-Frontend Glacier dùng:
-
-- `public/index.html`
-- `public/styles.css`
-- `public/app.js`
-
-## Những Gì Đã Thay Đổi
-
-### 1. Đưa `index.html` Về Lại `public/`
-
-Theo yêu cầu mới nhất, `index.html` đã được chuyển lại vào:
-
-```text
-public/index.html
-```
-
-Đường dẫn asset trong HTML đã được sửa để Vite xử lý:
-
-```html
-<link rel="stylesheet" href="./styles.css" />
-<script type="module" src="./app.js"></script>
-```
-
-### 2. Refactor Backend
-
-Backend đã được tách theo layer rõ ràng:
-
-- `src/app.js`: tạo Express app, middleware, route.
-- `src/server.js`: bootstrap server và graceful shutdown.
-- `src/routes/`: định nghĩa route.
-- `src/controllers/`: nhận request và trả response.
-- `src/services/translation.service.js`: xử lý flow dịch, cache, fallback, logging.
-- `src/providers/translation/`: chứa các provider dịch.
-- `src/config/env.js`: đọc và validate env.
-- `src/middlewares/`: error handler, rate limit.
-- `src/errors/AppError.js`: chuẩn hóa lỗi.
-- `src/logger/logger.js`: Winston logger.
-
-### 3. Tách Translation Provider
-
-Logic gọi Google Translate unofficial đã được đóng gói riêng:
-
-```text
-src/providers/translation/google-unofficial.provider.js
-```
-
-Provider hiện có:
-
-- `google_unofficial`: provider mặc định.
-- `mock`: provider giả lập cho test/dev/fallback.
-
-Sau này có thể thêm Google Cloud Translate, DeepL hoặc LibreTranslate mà không cần sửa controller/route.
-
-### 4. Error Handling An Toàn Hơn
-
-Nếu provider lỗi, timeout hoặc Google đổi response/token, app không crash. API trả lỗi thống nhất:
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "...",
-    "message": "..."
-  }
-}
-```
-
-Backend không log full text người dùng.
-
-### 5. Giao Diện Glacier
-
-Frontend cũ đã được thay bằng giao diện Glacier glassmorphism:
-
-- nhập văn bản
-- chọn ngôn ngữ nguồn/đích
-- đổi chiều ngôn ngữ
-- dịch bằng API
-- copy bản dịch
-- lịch sử dịch bằng `localStorage`
-- loading/error/empty state
-- light/dark mode
-- lưu theme vào `localStorage`
-
-### 6. Đa Ngôn Ngữ Giao Diện
-
-Nút chọn ngôn ngữ giao diện đã hoạt động:
-
-- Tiếng Việt
-- English
-
-Text UI được quản lý trong:
-
-```js
-translations.vi
-translations.en
-```
-
-Hàm chính:
-
-- `setUILanguage(lang)`
-- `applyTranslations()`
-- `getText(key)`
-
-Ngôn ngữ UI lưu tại:
-
-```text
-localStorage: glacier.translate.uiLanguage
-```
-
-## Biến Môi Trường Backend
-
-Server:
-
-- `NODE_ENV`: mặc định `development`
-- `HOST`: mặc định `0.0.0.0`
-- `PORT`: mặc định `3000`
-- `LOG_LEVEL`: mặc định `debug` ở dev, `info` ở production
-- `LOG_FORMAT`: mặc định `json`
-
-Translation:
-
-- `TRANSLATION_PROVIDER`: `google_unofficial` hoặc `mock`
-- `TRANSLATION_FALLBACK_PROVIDER`: provider fallback tùy chọn
-- `TRANSLATION_TIMEOUT_MS`: mặc định `10000`
-- `TRANSLATION_MAX_TEXT_LENGTH`: mặc định `5000`
-- `TRANSLATION_GOOGLE_TKK`: token seed cho Google unofficial
-- `TRANSLATE_TKK` / `TRANSLATE_TK`: alias cũ
-- `TRANSLATION_USER_AGENT`: user agent khi gọi Google unofficial
-
-Rate limit/cache:
-
-- `RATE_LIMIT_MAX`: mặc định `100`
-- `RATE_LIMIT_WINDOW_MS`: mặc định `60000`
-- `CACHE_ENABLED`: mặc định `false`
-- `CACHE_TTL_SECONDS`: mặc định `3600`
-
-## API Translate
-
-Request:
+Test API:
 
 ```bash
 curl -X POST http://localhost:3000/api/translate \
   -H "Content-Type: application/json" \
-  -d "{\"text\":\"Hello world\",\"from\":\"en\",\"to\":\"vi\",\"raw\":false}"
+  -d "{\"text\":\"xin chào\",\"from\":\"vi\",\"to\":\"en\",\"raw\":false}"
+```
+
+Script hữu ích:
+
+```bash
+npm start        # chạy Express không watch
+npm run lint
+npm test
+npm run build   # build frontend bằng Vite
+```
+
+`npm run dev:frontend` chỉ chạy Vite frontend, dùng khi cần xem UI tĩnh riêng. Luồng khuyến nghị vẫn là `npm run dev` để API `/api/translate` hoạt động cùng frontend.
+
+`npm run build` mặc định build asset ở root `/`, phù hợp với Vercel. Workflow GitHub Pages cũ được giữ ở `npm run build:github` và `npm run deploy`.
+
+## Deploy Lên Vercel
+
+Vercel dùng:
+
+- `api/translate.js` cho `POST /api/translate`.
+- `public/` làm source frontend.
+- `npm run build` để Vite xuất frontend ra `dist/`.
+- `vercel.json` để khai báo build output và fallback về `index.html`.
+
+Các bước:
+
+```bash
+npm install
+npm run lint
+npm test
+npm run build
+```
+
+Sau đó import repository lên Vercel hoặc chạy Vercel CLI nếu bạn đã cài:
+
+```bash
+vercel
+vercel --prod
+```
+
+Trong Vercel Project Settings:
+
+```text
+Build Command: npm run build
+Output Directory: dist
+Install Command: npm install
+```
+
+Các giá trị này cũng đã có trong `vercel.json`, nên thường không cần cấu hình thủ công.
+
+## Biến Môi Trường
+
+Không hardcode `localhost` hoặc token trong code. Frontend luôn gọi same-origin:
+
+```js
+fetch('/api/translate', ...)
+```
+
+Biến môi trường có thể cấu hình trên Vercel:
+
+```text
+TRANSLATION_PROVIDER=google_unofficial
+TRANSLATION_FALLBACK_PROVIDER=mock
+TRANSLATION_TIMEOUT_MS=10000
+TRANSLATION_MAX_TEXT_LENGTH=5000
+TRANSLATION_GOOGLE_TKK=448487.932609646
+TRANSLATION_USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+CACHE_ENABLED=false
+CACHE_TTL_SECONDS=3600
+LOG_LEVEL=info
+LOG_FORMAT=json
+```
+
+Không bắt buộc thêm biến nào nếu dùng mặc định. Nếu muốn test an toàn trên preview, có thể đặt:
+
+```text
+TRANSLATION_PROVIDER=mock
+```
+
+## API
+
+Endpoint:
+
+```text
+POST /api/translate
+```
+
+Request:
+
+```json
+{
+  "text": "xin chào",
+  "from": "vi",
+  "to": "en",
+  "raw": false
+}
 ```
 
 Response thành công:
@@ -279,11 +140,11 @@ Response thành công:
 {
   "success": true,
   "data": {
-    "text": "Xin chào thế giới",
+    "text": "hello",
     "from": {
       "language": {
         "didYouMean": false,
-        "iso": "en"
+        "iso": "vi"
       },
       "text": {
         "autoCorrected": false,
@@ -296,69 +157,71 @@ Response thành công:
 }
 ```
 
-## Cấu Trúc Chính
+Method khác `POST` trả:
 
-```text
-public/
-  index.html
-  styles.css
-  app.js
-
-src/
-  app.js
-  server.js
-  index.js
-  config/
-  controllers/
-  errors/
-  logger/
-  middlewares/
-  providers/
-  routes/
-  services/
-  utils/
-  validators/
-  test.js
-
-vite.config.js
-scripts/
-  deploy-gh-pages.js
-dist/
+```json
+{
+  "success": false,
+  "error": {
+    "code": "METHOD_NOT_ALLOWED",
+    "message": "Method not allowed"
+  }
+}
 ```
 
-## Test Hiện Có
+## Cấu Trúc
 
-Test hiện kiểm tra:
+```text
+project-root/
+  api/
+    translate.js
+  public/
+    index.html
+    app.js
+    styles.css
+  src/
+    app.js
+    server.js
+    config/
+    controllers/
+    errors/
+    logger/
+    middlewares/
+    providers/
+    routes/
+    services/
+    utils/
+    validators/
+  scripts/
+    deploy-gh-pages.js
+  package.json
+  vercel.json
+  vite.config.js
+  README.md
+```
 
-- lookup ngôn ngữ
-- generate token
-- build URL Google unofficial
-- parse response
-- validate input
-- service dịch bằng mock provider
-- API `POST /api/translate`
-- provider lỗi không làm app crash
-- fallback provider
+## Ghi Chú Kỹ Thuật
 
-Chạy:
+- `src/server.js` có `app.listen()` chỉ dùng cho local dev.
+- `api/translate.js` không gọi `app.listen()`, chỉ export default async handler cho Vercel.
+- Serverless handler tái sử dụng `validateTranslatePayload()` và `translationService.translate()` từ `src/`.
+- Logger không ghi file trong môi trường Vercel serverless.
+- Vite mặc định dùng base `/` cho Vercel. Nếu cần base khác, đặt `VITE_BASE_PATH` hoặc dùng `npm run build:github` cho GitHub Pages cũ.
+
+## Kiểm Tra
 
 ```bash
+npm run lint
 npm test
-```
-
-## Deploy Từng Bước
-
-```bash
-npm install
 npm run build
-npm run deploy
 ```
 
-Sau đó vào:
+Sau khi deploy Vercel, kiểm tra:
 
-```text
-https://leminhhuy1122.github.io/Translation/
-```
+- Trang `/` load đúng Glacier UI.
+- Network request khi bấm dịch là `POST /api/translate`.
+- Console không có lỗi `localhost`, CORS hoặc asset path.
+- API trả JSON đúng contract hiện tại.
 
 ## License
 

@@ -3,9 +3,10 @@ import path from 'node:path';
 import winston from 'winston';
 import env from '../config/env.js';
 
-const logsDir = path.resolve(process.cwd(), 'logs');
+const isServerlessRuntime = process.env.VERCEL === '1' || Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
+const logsDir = path.resolve(process.env.LOG_DIR || path.join(process.cwd(), 'logs'));
 
-if (!fs.existsSync(logsDir)) {
+if (!isServerlessRuntime && !fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
 }
 
@@ -41,7 +42,7 @@ const logger = winston.createLogger({
     ]
 });
 
-if (env.isProduction) {
+if (env.isProduction && !isServerlessRuntime) {
     logger.add(new winston.transports.File({
         filename: path.join(logsDir, 'error.log'),
         level: 'error',

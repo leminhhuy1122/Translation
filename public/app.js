@@ -1,5 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-const API_TRANSLATE_URL = `${API_BASE_URL}/api/translate`;
+const API_TRANSLATE_URL = '/api/translate';
 const HISTORY_STORAGE_KEY = 'glacier.translate.history';
 const THEME_STORAGE_KEY = 'glacier.translate.theme';
 const UI_LANGUAGE_STORAGE_KEY = 'glacier.translate.uiLanguage';
