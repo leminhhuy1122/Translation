@@ -46,7 +46,7 @@ npm run check
 
 ## Tóm Tắt Dự Án
 
-Đây là Node.js API server dùng ES Modules, runtime Node.js 22+, có frontend tĩnh trong `public/`.
+Đây là Node.js API server dùng ES Modules, runtime Node.js 22+, có `index.html` ở root và asset tĩnh trong `public/`.
 
 Backend cung cấp API dịch:
 
@@ -108,9 +108,9 @@ Backend không log full text người dùng, chỉ log metadata như ngôn ngữ
 
 ### 4. Giao Diện Glacier Mới
 
-Giao diện cũ trong `public/` đã được thay bằng giao diện Glacier glassmorphism:
+Giao diện cũ đã được thay bằng giao diện Glacier glassmorphism:
 
-- `public/index.html`
+- `index.html`
 - `public/styles.css`
 - `public/app.js`
 
@@ -247,8 +247,9 @@ src/
   validators/
   test.js
 
+index.html
+
 public/
-  index.html
   styles.css
   app.js
 ```

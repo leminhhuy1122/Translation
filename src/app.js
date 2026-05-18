@@ -14,6 +14,7 @@ import logger from './logger/logger.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, '..', 'public');
+const rootIndexPath = path.join(__dirname, '..', 'index.html');
 
 function createApp(options = {}) {
     const appLogger = options.logger || logger;
@@ -29,8 +30,9 @@ function createApp(options = {}) {
     app.use(express.urlencoded({ extended: false, limit: '1mb' }));
     app.use(morgan('combined', { stream: appLogger.stream }));
 
+    app.use('/public', express.static(publicDir));
     app.use(express.static(publicDir));
-    app.get('/', (_req, res) => res.sendFile(path.join(publicDir, 'index.html')));
+    app.get('/', (_req, res) => res.sendFile(rootIndexPath));
 
     app.get('/health', (_req, res) => {
         res.status(200).json({
