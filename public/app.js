@@ -321,8 +321,7 @@ function getTranslationLanguageLabel(code) {
 // Khôi phục theme từ localStorage để reload trang vẫn giữ đúng sáng/tối.
 function restoreTheme() {
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  const preferredTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-  applyTheme(savedTheme || preferredTheme);
+  applyTheme(savedTheme || 'light');
 }
 
 // Cập nhật attribute trên html để toàn bộ CSS đổi theme đồng bộ.
